@@ -8,16 +8,37 @@
 
 /* Begin PBXBuildFile section */
 		7B5753261E1E6385002A022F /* Pax.h in Headers */ = {isa = PBXBuildFile; fileRef = 7B5753241E1E6385002A022F /* Pax.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		7B57532D1E1E6395002A022F /* Pax.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B57532C1E1E6395002A022F /* Pax.swift */; };
+		7B5753351E1EF230002A022F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B5753341E1EF230002A022F /* AppDelegate.swift */; };
+		7B5753371E1EF230002A022F /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B5753361E1EF230002A022F /* ViewController.swift */; };
+		7B57533A1E1EF230002A022F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7B5753381E1EF230002A022F /* Main.storyboard */; };
+		7B57533C1E1EF230002A022F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7B57533B1E1EF230002A022F /* Assets.xcassets */; };
+		7B57533F1E1EF230002A022F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7B57533D1E1EF230002A022F /* LaunchScreen.storyboard */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		7B5753211E1E6385002A022F /* Pax.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pax.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B5753241E1E6385002A022F /* Pax.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Pax.h; sourceTree = "<group>"; };
 		7B5753251E1E6385002A022F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		7B57532C1E1E6395002A022F /* Pax.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Pax.swift; sourceTree = "<group>"; };
+		7B5753321E1EF230002A022F /* Demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Demo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		7B5753341E1EF230002A022F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		7B5753361E1EF230002A022F /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		7B5753391E1EF230002A022F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		7B57533B1E1EF230002A022F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		7B57533E1E1EF230002A022F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		7B5753401E1EF230002A022F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		7B57531D1E1E6385002A022F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7B57532F1E1EF230002A022F /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -31,6 +52,7 @@
 			isa = PBXGroup;
 			children = (
 				7B5753231E1E6385002A022F /* Pax */,
+				7B5753331E1EF230002A022F /* Demo */,
 				7B5753221E1E6385002A022F /* Products */,
 			);
 			sourceTree = "<group>";
@@ -39,6 +61,7 @@
 			isa = PBXGroup;
 			children = (
 				7B5753211E1E6385002A022F /* Pax.framework */,
+				7B5753321E1EF230002A022F /* Demo.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -47,9 +70,23 @@
 			isa = PBXGroup;
 			children = (
 				7B5753241E1E6385002A022F /* Pax.h */,
+				7B57532C1E1E6395002A022F /* Pax.swift */,
 				7B5753251E1E6385002A022F /* Info.plist */,
 			);
 			path = Pax;
+			sourceTree = "<group>";
+		};
+		7B5753331E1EF230002A022F /* Demo */ = {
+			isa = PBXGroup;
+			children = (
+				7B5753341E1EF230002A022F /* AppDelegate.swift */,
+				7B5753361E1EF230002A022F /* ViewController.swift */,
+				7B5753381E1EF230002A022F /* Main.storyboard */,
+				7B57533B1E1EF230002A022F /* Assets.xcassets */,
+				7B57533D1E1EF230002A022F /* LaunchScreen.storyboard */,
+				7B5753401E1EF230002A022F /* Info.plist */,
+			);
+			path = Demo;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -84,16 +121,39 @@
 			productReference = 7B5753211E1E6385002A022F /* Pax.framework */;
 			productType = "com.apple.product-type.framework";
 		};
+		7B5753311E1EF230002A022F /* Demo */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7B5753411E1EF230002A022F /* Build configuration list for PBXNativeTarget "Demo" */;
+			buildPhases = (
+				7B57532E1E1EF230002A022F /* Sources */,
+				7B57532F1E1EF230002A022F /* Frameworks */,
+				7B5753301E1EF230002A022F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Demo;
+			productName = Demo;
+			productReference = 7B5753321E1EF230002A022F /* Demo.app */;
+			productType = "com.apple.product-type.application";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
 		7B5753181E1E6385002A022F /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastSwiftUpdateCheck = 0820;
 				LastUpgradeCheck = 0820;
 				ORGANIZATIONNAME = Synesthesia;
 				TargetAttributes = {
 					7B5753201E1E6385002A022F = {
+						CreatedOnToolsVersion = 8.2.1;
+						LastSwiftMigration = 0820;
+						ProvisioningStyle = Automatic;
+					};
+					7B5753311E1EF230002A022F = {
 						CreatedOnToolsVersion = 8.2.1;
 						ProvisioningStyle = Automatic;
 					};
@@ -105,6 +165,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				Base,
 			);
 			mainGroup = 7B5753171E1E6385002A022F;
 			productRefGroup = 7B5753221E1E6385002A022F /* Products */;
@@ -112,6 +173,7 @@
 			projectRoot = "";
 			targets = (
 				7B5753201E1E6385002A022F /* Pax */,
+				7B5753311E1EF230002A022F /* Demo */,
 			);
 		};
 /* End PBXProject section */
@@ -124,6 +186,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		7B5753301E1EF230002A022F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7B57533F1E1EF230002A022F /* LaunchScreen.storyboard in Resources */,
+				7B57533C1E1EF230002A022F /* Assets.xcassets in Resources */,
+				7B57533A1E1EF230002A022F /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -131,10 +203,39 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7B57532D1E1E6395002A022F /* Pax.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7B57532E1E1EF230002A022F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7B5753371E1EF230002A022F /* ViewController.swift in Sources */,
+				7B5753351E1EF230002A022F /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		7B5753381E1EF230002A022F /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				7B5753391E1EF230002A022F /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		7B57533D1E1EF230002A022F /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				7B57533E1E1EF230002A022F /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		7B5753271E1E6385002A022F /* Debug */ = {
@@ -239,6 +340,29 @@
 		7B57532A1E1E6385002A022F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "";
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = Pax/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = it.synesthesia.Pax;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
+			};
+			name = Debug;
+		};
+		7B57532B1E1E6385002A022F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -252,22 +376,30 @@
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 3.0;
 			};
-			name = Debug;
+			name = Release;
 		};
-		7B57532B1E1E6385002A022F /* Release */ = {
+		7B5753421E1EF230002A022F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "";
-				DEFINES_MODULE = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = Pax/Info.plist;
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = it.synesthesia.Pax;
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_FILE = Demo/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = it.synesthesia.Demo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
+			};
+			name = Debug;
+		};
+		7B5753431E1EF230002A022F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_FILE = Demo/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = it.synesthesia.Demo;
+				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
@@ -289,6 +421,14 @@
 			buildConfigurations = (
 				7B57532A1E1E6385002A022F /* Debug */,
 				7B57532B1E1E6385002A022F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		7B5753411E1EF230002A022F /* Build configuration list for PBXNativeTarget "Demo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7B5753421E1EF230002A022F /* Debug */,
+				7B5753431E1EF230002A022F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 		};
