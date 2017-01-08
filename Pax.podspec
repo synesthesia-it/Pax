@@ -11,8 +11,6 @@ Pod::Spec.new do |s|
   s.name             = "Pax"
   s.version          = "0.9"
   s.summary          = "A Swift customizalbe drawer/side menu for iOS"
-  s.description      = <<-DESC
-                       A Swift customizalbe drawer/side menu (both left and/or right) for iOS written in Swift                       DESC
   s.homepage         = "https://github.com/synesthesia-it/Pax"
   s.license          = 'MIT'
   s.author           = { "Stefano Mondino" => "stefano.mondino.dev@gmail.com" }
