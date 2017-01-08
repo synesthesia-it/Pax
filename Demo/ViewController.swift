@@ -16,7 +16,9 @@ class PaxController: Pax {
         self.mode = .onTop
         let main = UINavigationController(rootViewController: Center())
         let menu = Menu()
+        let other = Menu()
         self.setMainViewController(main)
+        //self.rightViewController = other
         self.leftViewController = menu
     }
 
@@ -31,8 +33,10 @@ class Menu: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.pax_width = 200
-        self.view.backgroundColor = UIColor.orange.withAlphaComponent(0.5)
+        self.pax_width = 300
+        self.view.layer.borderColor = UIColor.black.cgColor
+        self.view.layer.borderWidth = 20
+        self.view.backgroundColor = UIColor.orange.withAlphaComponent(1.5)
     }
 }
 

@@ -28,6 +28,7 @@
 		7B57533B1E1EF230002A022F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7B57533E1E1EF230002A022F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		7B5753401E1EF230002A022F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		7B5753471E225640002A022F /* Pax.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; path = Pax.podspec; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -51,6 +52,7 @@
 		7B5753171E1E6385002A022F = {
 			isa = PBXGroup;
 			children = (
+				7B5753471E225640002A022F /* Pax.podspec */,
 				7B5753231E1E6385002A022F /* Pax */,
 				7B5753331E1EF230002A022F /* Demo */,
 				7B5753221E1E6385002A022F /* Products */,
