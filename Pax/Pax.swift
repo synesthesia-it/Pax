@@ -453,7 +453,7 @@ open class Pax : UIViewController , UIGestureRecognizerDelegate {
         }
     }
     
-    func showLeftViewController(animated:Bool) {
+    public func showLeftViewController(animated:Bool) {
         guard let leftViewController = self.leftViewController else {
             return
         }
@@ -491,7 +491,7 @@ open class Pax : UIViewController , UIGestureRecognizerDelegate {
         
         
     }
-    func hideLeftViewController(animated:Bool) {
+    public func hideLeftViewController(animated:Bool) {
         guard let leftViewController = self.leftViewController else {
             return
         }
@@ -530,7 +530,7 @@ open class Pax : UIViewController , UIGestureRecognizerDelegate {
         }
     }
     
-    func showRightViewController(animated:Bool) {
+    public func showRightViewController(animated:Bool) {
         guard let rightViewController = self.rightViewController else {
             return
         }
@@ -568,7 +568,7 @@ open class Pax : UIViewController , UIGestureRecognizerDelegate {
         
         
     }
-    func hideRightViewController(animated:Bool) {
+    public func hideRightViewController(animated:Bool) {
         guard let rightViewController = self.rightViewController else {
             return
         }
