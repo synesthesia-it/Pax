@@ -279,7 +279,7 @@ open class Pax : UIViewController , UIGestureRecognizerDelegate {
                 self.leftClosedPosition = -w
                 self.view.addSubview(leftViewController.view)
                 self.leftConstraint = leftViewController.view.pax_alignLeft(width: w)
-            
+                
             default:
                 self.leftOpenPosition = w
                 self.leftClosedPosition = 0
@@ -336,7 +336,7 @@ open class Pax : UIViewController , UIGestureRecognizerDelegate {
             rightViewController.view.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(handlePan(_:))))
             self.rightPanGestureRecognizer.isEnabled = true
         }
-            
+        
     }
     
     open override func viewDidLoad() {
@@ -355,8 +355,8 @@ open class Pax : UIViewController , UIGestureRecognizerDelegate {
         shadowView.backgroundColor = self.shadowViewColor
         
         shadowView.alpha = prevAlpha
-        self.view.addSubview(shadowView)
-        shadowView.pax_centerInSuperview()
+        
+        
         shadowView.isUserInteractionEnabled = true
         let tap = UITapGestureRecognizer(target: self, action: #selector(hideSideControllers))
         shadowView.addGestureRecognizer(tap)
@@ -365,10 +365,13 @@ open class Pax : UIViewController , UIGestureRecognizerDelegate {
             let gesture = UIPanGestureRecognizer(target: self, action: #selector(handlePan(_:)))
             gesture.delegate = self
             shadowView.addGestureRecognizer(gesture)
+            self.mainViewController?.view.addSubview(shadowView)
+            shadowView.pax_centerInSuperview()
         }
         else {
             if (self.mainViewController != nil){
                 self.view.insertSubview(shadowView, aboveSubview:self.mainViewController!.view)
+                shadowView.pax_centerInSuperview()
             }
         }
         
@@ -406,6 +409,7 @@ open class Pax : UIViewController , UIGestureRecognizerDelegate {
             let oldValue = self.leftConstraint?.constant ?? 0.0
             self.leftConstraint = mainViewController.view.pax_alignLeft(width: self.view.frame.size.width)
             self.leftConstraint?.constant = oldValue
+            self.setupShadowView()
             
         case .fixedRight:
             
@@ -417,6 +421,7 @@ open class Pax : UIViewController , UIGestureRecognizerDelegate {
             let oldValue = self.rightConstraint?.constant ?? 0.0
             self.rightConstraint = mainViewController.view.pax_alignRight(width: self.view.frame.size.width)
             self.rightConstraint?.constant = oldValue
+            self.setupShadowView()
         }
         
         let completion = {
@@ -638,28 +643,33 @@ open class Pax : UIViewController , UIGestureRecognizerDelegate {
             guard let _ = self.panningView else {
                 return
             }
-            if (velocity > self.view.frame.size.width / 3.0) {
-                if (isLeft == true && self.isRightOpen == false) {
-                    self.showLeftViewController(animated: true)
-                }
-                else {
-                    
-                    self.hideRightViewController(animated: true)
-                }
-            } else if (velocity < self.view.frame.size.width / 3.0) {
-                if (self.isLeftOpen == false && isLeft == false) {
-                    self.showRightViewController(animated: true)
-                }
-                else {
-                    self.hideLeftViewController(animated: true)
-                }
+            if (velocity > self.view.frame.size.width / 3.0 && isLeft == true && self.isRightOpen == false) {
+                
+                self.showLeftViewController(animated: true)
+                
+            } else if (velocity < self.view.frame.size.width / 3.0 && self.isLeftOpen == false && isLeft == false) {
+                
+                self.showRightViewController(animated: true)
+                
+                
             }
             else {
                 if (isLeft == true) {
-                    let x = self.leftViewController?.view.frame.origin.x ?? 0.0
+                    
                     let w = self.leftViewController?.pax_width ??  0.0
-                    let pos:CGFloat = (x - self.leftOpenPosition)/(w - self.leftOpenPosition)
-                    abs(pos) > 0.5 ? self.hideLeftViewController(animated: true) : self.showLeftViewController(animated: true)
+                    var hide:Bool = false
+                    if (self.mode == .fixedLeft) {
+                        let x = self.mainViewController?.view.frame.origin.x ?? 0.0
+                        hide = abs(x - w) > (w/2)
+                    }
+                    else {
+                        let x = self.leftViewController?.view.frame.origin.x ?? 0.0
+                        let pos:CGFloat = (x - self.leftOpenPosition)/(w - self.leftOpenPosition)
+                        hide = abs(pos) > 0.5
+                    }
+                    
+                    hide ? self.hideLeftViewController(animated: true) : self.showLeftViewController(animated: true)
+                    
                 }
                 else {
                     let x = self.rightViewController?.view.frame.origin.x ?? 0.0
@@ -685,11 +695,11 @@ open class Pax : UIViewController , UIGestureRecognizerDelegate {
             }
             else {
                 print ("Before: " + String(describing:x))
-//                if (panGesture.view == self.rightViewController?.view) {
-//                    x =   (self.rightOpenPosition) - x
-//                    
-//                }
-//                print ("After: " + String(describing:x))
+                //                if (panGesture.view == self.rightViewController?.view) {
+                //                    x =   (self.rightOpenPosition) - x
+                //
+                //                }
+                //                print ("After: " + String(describing:x))
                 //x = max(openNW, min(x +  self.panningPadding , closedNW))
                 //alpha = self.shadowViewAlpha - abs(self.shadowViewAlpha * (x - openNW) / (openNW - closedNW))
                 
