@@ -1,0 +1,16 @@
+PODS:
+  - Pax (0.1.0)
+
+DEPENDENCIES:
+  - Pax (from `../`)
+
+EXTERNAL SOURCES:
+  Pax:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  Pax: 52fb70331d9439943d1a6871badf08d1b19a6ce6
+
+PODFILE CHECKSUM: f1cab2f72cdc7660f71cc3c1a3ea8e97b68336df
+
+COCOAPODS: 1.9.0

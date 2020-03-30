@@ -1,0 +1,11 @@
+use_frameworks!
+
+target 'Pax_Example' do
+  pod 'Pax', :path => '../'
+
+  target 'Pax_Tests' do
+    inherit! :search_paths
+
+    
+  end
+end

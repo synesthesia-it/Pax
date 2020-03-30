@@ -1,27 +1,50 @@
 //
 //  AppDelegate.swift
-//  Demo
+//  Pax
 //
-//  Created by Stefano Mondino on 05/01/17.
-//  Copyright © 2017 Synesthesia. All rights reserved.
+//  Created by Stefano Mondino on 03/30/2020.
+//  Copyright (c) 2020 Stefano Mondino. All rights reserved.
 //
 
 import UIKit
-
+import Pax
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
 
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+
+        let window = UIWindow(frame: UIScreen.main.bounds)
+        window.rootViewController = pax()
+        window.makeKeyAndVisible()
+        self.window = window
         return true
+    }
+
+    func pax() -> UIViewController {
+        //This usually should go on your Router, Coordinator or any other "navigation manager" you're using in your app.
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        let root = Pax()
+        let left = storyboard.instantiateViewController(withIdentifier: "left")
+        left.view.backgroundColor = .yellow
+        let right = UIViewController()
+        right.view.backgroundColor = .green
+        let center = storyboard.instantiateViewController(withIdentifier: "navigationController")
+
+        left.pax.menuWidth = UIScreen.main.bounds.width * 0.8
+        right.pax.menuWidth = UIScreen.main.bounds.width * 0.6
+        root.leftViewController = left
+        root.rightViewController = right
+        root.setMainViewController(center)
+        return root
     }
 
     func applicationWillResignActive(_ application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
-        // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
+        // Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.
     }
 
     func applicationDidEnterBackground(_ application: UIApplication) {
@@ -30,7 +53,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func applicationWillEnterForeground(_ application: UIApplication) {
-        // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
+        // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
     }
 
     func applicationDidBecomeActive(_ application: UIApplication) {
