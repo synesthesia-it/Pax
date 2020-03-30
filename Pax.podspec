@@ -9,7 +9,7 @@
 
 Pod::Spec.new do |s|
   s.name             = "Pax"
-  s.version          = "0.9"
+  s.version          = "1.0"
   s.summary          = "A Swift customizalbe drawer/side menu for iOS"
   s.homepage         = "https://github.com/synesthesia-it/Pax"
   s.license          = 'MIT'
@@ -17,9 +17,9 @@ Pod::Spec.new do |s|
   s.source           = { :git => "https://github.com/synesthesia-it/Pax.git", :tag => s.version.to_s }
   s.social_media_url = 'https://twitter.com/puntoste'
 
-  s.platform     = :ios, '8.0'
+  s.platform     = :ios, '9.0'
   s.requires_arc = true
 
-  s.source_files = 'Pax/*.swift'
+  s.source_files = 'Pax/Classes/*.swift'
 
 end
