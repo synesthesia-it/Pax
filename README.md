@@ -1,5 +1,5 @@
 # Pax
-iOS Drawer/SideMenu/HamburgerMenu
+Pax is a side-menu controller (or "drawer", hence the very "swedish" name) for those menus coming out from the side of the screen.
 
 ![gif](images/pax.gif)
 

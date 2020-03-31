@@ -31,6 +31,16 @@ public struct PaxProxy<T: UIViewController> {
     public func showMenu(at side: Pax.Side, animated: Bool = true) {
         controller?.showViewController(at: side, animated: animated)
     }
+
+    public func currentSide() -> Pax.Side? {
+        if self.controller?.isOpen(at: .left) == true {
+            return .left
+        }
+        if self.controller?.isOpen(at: .right) == true {
+            return .right
+        }
+        return nil
+    }
 }
 
 private struct AssociatedKeys {
@@ -38,7 +48,7 @@ private struct AssociatedKeys {
     static var MainEffect = "pax_mainEffect"
 }
 
-public typealias MainEffect = (_ offset: CGFloat, _ viewController: UIViewController) -> Void
+public typealias MainEffect = (_ offset: CGFloat, _ viewController: UIViewController, _ side: Pax.Side) -> Void
 
 extension UIViewController {
     fileprivate var paxWidth: CGFloat {
@@ -126,7 +136,7 @@ open class Pax: UIViewController {
         return mainViewController?.preferredStatusBarStyle ?? super.preferredStatusBarStyle
     }
 
-    public lazy var defaultEffect: MainEffect = { offset, viewController in
+    public lazy var defaultEffect: MainEffect = { offset, viewController, side in
         let scale: CGFloat = 1.0 - (offset / 6.0)
         let radius: CGFloat = 20.0
         viewController.view.layer.cornerRadius = offset * radius
@@ -223,9 +233,9 @@ open class Pax: UIViewController {
             .forEach { self.hideViewController(at: $0, animated: true) }
     }
 
-    public func updateMainAnimation(_ offset: CGFloat) {
+    public func updateMainAnimation(_ offset: CGFloat, side: Pax.Side) {
         if let viewController = self.mainViewController {
-            (viewController.pax.mainEffect ?? self.defaultEffect)(offset, viewController)
+            (viewController.pax.mainEffect ?? self.defaultEffect)(offset, viewController, side)
         }
     }
 
@@ -284,7 +294,7 @@ extension Pax {
         self.mainViewController = mainViewController
 
         self.addChild(mainViewController)
-        self.updateMainAnimation((self.isOpen(at: .left) || self.isOpen(at: .right)) ? 1 : 0)
+        self.updateMainAnimation((isOpen(at: .left) || isOpen(at: .right)) ? 1 : 0, side: pax.currentSide() ?? .left)
         if hidesLeftViewControllerOnMainChange {
             self.hideViewController(at: .left, animated: animated)
         } else if hidesRightViewControllerOnMainChange {
@@ -384,7 +394,7 @@ extension Pax {
             view?.superview?.layoutIfNeeded()
             shadowView?.alpha = shadowViewAlpha
             let relative: CGFloat = 1.0
-            self.updateMainAnimation(relative)
+            self.updateMainAnimation(relative, side: side)
         }
         if animated {
             UIView.animate(withDuration: currentAnimationDuration,
@@ -408,7 +418,7 @@ extension Pax {
         let animations = { [weak self] in
             viewController.view?.superview?.layoutIfNeeded()
             self?.shadowView?.alpha = 0
-            self?.updateMainAnimation(0)
+            self?.updateMainAnimation(0, side: side)
         }
         let ending = { [weak self] (finished: Bool) -> Void in
             self?.leftEdgePanGestureRecognizer.isEnabled = true
@@ -535,6 +545,6 @@ fileprivate extension Pax {
         self.shadowView?.alpha = alpha
 
         let relative = (alpha / shadowViewAlpha)
-        self.updateMainAnimation(relative)
+        self.updateMainAnimation(relative, side: side)
     }
 }

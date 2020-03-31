@@ -12,8 +12,6 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Do any additional setup after loading the view, typically from a nib.
     }
 
     override func didReceiveMemoryWarning() {
@@ -31,9 +29,10 @@ class ViewController: UIViewController {
         let vc = storyboard.instantiateViewController(withIdentifier: "red")
         pax.controller?.setMainViewController(vc, animated: true)
 
-        vc.pax.mainEffect = { percentage, viewController in
-            //A completely pointless main controller transition
-            let transform = CATransform3DMakeRotation( -percentage * CGFloat.pi / 4, 0, 0, 1)
+        vc.pax.mainEffect = { percentage, viewController, side in
+            let width = (viewController.pax.controller?.viewController(at: side)?.pax.menuWidth ?? 0)
+            let direction: CGFloat = side == .left ? 1 : -1
+            let transform = CATransform3DMakeTranslation(percentage * width * direction , 0, 0)
             viewController.view.layer.zPosition = -1
             viewController.view.layer.transform = transform
         }
