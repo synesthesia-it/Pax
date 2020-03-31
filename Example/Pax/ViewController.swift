@@ -12,7 +12,7 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         // Do any additional setup after loading the view, typically from a nib.
     }
 
@@ -21,10 +21,10 @@ class ViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     @IBAction func showLeft(_ sender: Any) {
-        pax.controller?.showLeftViewController(animated: true)
+        pax.controller?.showViewController(at: .left, animated: true)
     }
     @IBAction func showRight(_ sender: Any) {
-        pax.controller?.showRightViewController(animated: true)
+        pax.controller?.showViewController(at: .right, animated: true)
     }
     @IBAction func openRed(_ sender: Any) {
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
@@ -44,4 +44,3 @@ class ViewController: UIViewController {
         pax.controller?.setMainViewController(vc, animated: true)
     }
 }
-

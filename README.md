@@ -15,18 +15,22 @@ iOS Drawer/SideMenu/HamburgerMenu
 
 ```swift
 
-let storyboard = UIStoryboard(name: "Main", bundle: nil) 
+let storyboard = UIStoryboard(name: "Main", bundle: nil)
+let paxController = Pax()
+//A storyboard-instantiated view controller for left side
+let left = storyboard.instantiateViewController(withIdentifier: "left")
+left.view.backgroundColor = .yellow
+//A code-instantiated green view controller for right side
+let right = UIViewController()
+right.view.backgroundColor = .green
+//Main "center" view controller
+let center = storyboard.instantiateViewController(withIdentifier: "navigationController")
 
-let paxController = Pax() //the main controller
-let left = storyboard.instantiateViewController(withIdentifier: "left") //the left menu
-let right = UIViewController() //the right menu
-
-let center = storyboard.instantiateViewController(withIdentifier: "navigationController") //center controller
-
-left.pax.menuWidth = UIScreen.main.bounds.width * 0.8 //custom widths for both left and right controllers
+//CustomWidth for both left and right side menus
+left.pax.menuWidth = UIScreen.main.bounds.width * 0.8
 right.pax.menuWidth = UIScreen.main.bounds.width * 0.6
-paxController.leftViewController = left
-paxController.rightViewController = right
-paxController.setMainViewController(center) //Animatable if needed
+paxController.setViewController(left, at: .left)
+paxController.setViewController(right, at: .right)
+paxController.setMainViewController(center)
 
 ```

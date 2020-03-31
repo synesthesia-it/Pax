@@ -13,7 +13,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
-
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
 
@@ -27,19 +26,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func pax() -> UIViewController {
         //This usually should go on your Router, Coordinator or any other "navigation manager" you're using in your app.
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        let root = Pax()
+        let paxController = Pax()
+        //A storyboard-instantiated view controller for left side
         let left = storyboard.instantiateViewController(withIdentifier: "left")
         left.view.backgroundColor = .yellow
+        //A code-instantiated green view controller for right side
         let right = UIViewController()
         right.view.backgroundColor = .green
+        //Main "center" view controller
         let center = storyboard.instantiateViewController(withIdentifier: "navigationController")
 
+        //CustomWidth for both left and right side menus
         left.pax.menuWidth = UIScreen.main.bounds.width * 0.8
         right.pax.menuWidth = UIScreen.main.bounds.width * 0.6
-        root.leftViewController = left
-        root.rightViewController = right
-        root.setMainViewController(center)
-        return root
+        paxController.setViewController(left, at: .left)
+        paxController.setViewController(right, at: .right)
+        paxController.setMainViewController(center)
+        return paxController
     }
 
     func applicationWillResignActive(_ application: UIApplication) {
@@ -64,6 +67,4 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
 
-
 }
-

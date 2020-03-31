@@ -1,3 +1,4 @@
+// swiftlint:disable file_length
 
 import UIKit
 
@@ -19,24 +20,20 @@ public struct PaxProxy<T: UIViewController> {
     }
 
     public var menuWidth: CGFloat {
-        get { base.pax_width }
-        nonmutating set { base.pax_width = newValue}
+        get { base.paxWidth }
+        nonmutating set { base.paxWidth = newValue}
     }
 
     public var mainEffect: MainEffect? {
-        get { base.pax_mainEffect }
-        nonmutating set { base.pax_mainEffect = newValue}
+        get { base.mainEffect }
+        nonmutating set { base.mainEffect = newValue}
     }
-
-    public func showLeft(animated: Bool = true) {
-        controller?.showLeftViewController(animated: animated)
-    }
-    public func showRight(animated: Bool = true) {
-        controller?.showRightViewController(animated: animated)
+    public func showMenu(at side: Pax.Side, animated: Bool = true) {
+        controller?.showViewController(at: side, animated: animated)
     }
 }
 
-fileprivate struct AssociatedKeys {
+private struct AssociatedKeys {
     static var Width = "pax_width"
     static var MainEffect = "pax_mainEffect"
 }
@@ -44,7 +41,7 @@ fileprivate struct AssociatedKeys {
 public typealias MainEffect = (_ offset: CGFloat, _ viewController: UIViewController) -> Void
 
 extension UIViewController {
-    fileprivate var pax_width: CGFloat {
+    fileprivate var paxWidth: CGFloat {
         get {
             return objc_getAssociatedObject(self, &AssociatedKeys.Width) as? CGFloat ?? 0.0
         }
@@ -53,7 +50,7 @@ extension UIViewController {
         }
     }
 
-    fileprivate var pax_mainEffect: MainEffect? {
+    fileprivate var mainEffect: MainEffect? {
         get {
             return objc_getAssociatedObject(self, &AssociatedKeys.MainEffect) as? MainEffect
         }
@@ -116,17 +113,18 @@ fileprivate extension UIView {
     }
 }
 
-open class Pax: UIViewController, UIGestureRecognizerDelegate {
+open class Pax: UIViewController {
 
+    public enum Side: CaseIterable {
+        case left
+        case right
+    }
     private var shadowView: UIView?
     private var velocity: CGFloat = 0.0
 
     open override var preferredStatusBarStyle: UIStatusBarStyle {
         return mainViewController?.preferredStatusBarStyle ?? super.preferredStatusBarStyle
     }
-
-    var leftPanGestureRecognizer: UIPanGestureRecognizer?
-    var rightPanGestureRecognizer: UIPanGestureRecognizer?
 
     public lazy var defaultEffect: MainEffect = { offset, viewController in
         let scale: CGFloat = 1.0 - (offset / 6.0)
@@ -166,8 +164,7 @@ open class Pax: UIViewController, UIGestureRecognizerDelegate {
         }
     }
 
-    private var _mainAnimationDuration: CGFloat = 0.2
-    var mainAnimationDuration: CGFloat {
+    public var mainAnimationDuration: CGFloat {
         get {
             return _mainAnimationDuration
         }
@@ -176,6 +173,9 @@ open class Pax: UIViewController, UIGestureRecognizerDelegate {
         }
     }
 
+    private var panningView: UIView?
+    private var sideControllers: [Side: UIViewController] = [:]
+    private var _mainAnimationDuration: CGFloat = 0.2
     private var leftOpenPosition: CGFloat = 0.0
     private var leftClosedPosition: CGFloat = 0.0
 
@@ -186,90 +186,30 @@ open class Pax: UIViewController, UIGestureRecognizerDelegate {
     private var leftMainConstraint: NSLayoutConstraint?
     private var rightConstraint: NSLayoutConstraint?
 
-    var shadowViewAlpha: CGFloat = 0.5 {
+    private var leftPanGestureRecognizer: UIPanGestureRecognizer?
+    private var rightPanGestureRecognizer: UIPanGestureRecognizer?
+
+    private var panningPadding: CGFloat = 0.0
+
+    public var shadowViewAlpha: CGFloat = 0.5 {
         didSet {
             self.shadowView?.alpha = shadowViewAlpha
         }
     }
-    var shadowViewColor = UIColor.black {
+    public var shadowViewColor = UIColor.black {
         didSet {
             self.shadowView?.backgroundColor = shadowViewColor
         }
     }
 
-    var leftParallaxAmount: CGFloat = 0.0
-    var rightParallaxAmount: CGFloat = 0.0
+    public var hidesLeftViewControllerOnMainChange = true
+    public var hidesRightViewControllerOnMainChange = true
 
-    var shouldHideLeftViewControllerOnMainChange = true
-    var shouldHideRightViewControllerOnMainChange = true
-
-    var isLeftOpen: Bool {
-        guard let left = self.leftViewController else {
-            return false
-        }
-        return abs(left.view.frame.origin.x - self.leftClosedPosition) > 1
+    open func viewController(at side: Side) -> UIViewController? {
+        return sideControllers[side]
     }
-    var isRightOpen: Bool {
-        guard let right = self.rightViewController else {
-            return false
-        }
-        return abs (right.view.frame.origin.x - self.view.bounds.width) > 1
-    }
-
-    fileprivate var panningView: UIView?
 
     var mainViewController: UIViewController?
-
-    public var leftViewController: UIViewController? {
-        didSet {
-            oldValue?.view.removeFromSuperview()
-            oldValue?.removeFromParent()
-            guard let leftViewController = leftViewController else {
-                return
-            }
-            _ = leftViewController.view
-            let w = leftViewController.pax_width
-
-            self.addChild(leftViewController)
-
-            self.leftOpenPosition = 0
-            self.leftClosedPosition = -w
-            self.view.addSubview(leftViewController.view)
-            self.leftConstraint = leftViewController.view.pax_alignLeft(width: w)
-
-            self.hideLeftViewController(animated: false)
-            leftViewController.view.isUserInteractionEnabled = true
-            leftPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(handlePan(_:)))
-            leftPanGestureRecognizer?.cancelsTouchesInView = true
-            leftViewController.view.addGestureRecognizer(leftPanGestureRecognizer ?? UIPanGestureRecognizer(target: self, action: #selector(handlePan(_:))))
-            self.leftEdgePanGestureRecognizer.isEnabled = true
-        }
-    }
-
-    public var rightViewController: UIViewController? {
-        didSet {
-            oldValue?.view.removeFromSuperview()
-            oldValue?.removeFromParent()
-            guard let rightViewController = rightViewController else {
-                return
-            }
-            _ = rightViewController.view
-            let w = rightViewController.pax_width
-
-            self.addChild(rightViewController)
-
-            self.rightOpenPosition = 0
-            self.rightClosedPosition = -rightViewController.pax_width
-            self.view.addSubview(rightViewController.view)
-            self.rightConstraint = rightViewController.view.pax_alignRight(width: w)
-
-            self.hideRightViewController(animated: false)
-            rightViewController.view.isUserInteractionEnabled = true
-            rightPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(handlePan(_:)))
-            rightViewController.view.addGestureRecognizer(rightPanGestureRecognizer ?? UIPanGestureRecognizer(target: self, action: #selector(handlePan(_:))))
-            self.rightEdgePanGestureRecognizer.isEnabled = true
-        }
-    }
 
     open override func viewDidLoad() {
         super.viewDidLoad()
@@ -277,8 +217,229 @@ open class Pax: UIViewController, UIGestureRecognizerDelegate {
         view.backgroundColor = .darkGray
     }
 
+    @objc func hideSideControllers() {
+        Side.allCases
+            .filter { self.isOpen(at: $0)}
+            .forEach { self.hideViewController(at: $0, animated: true) }
+    }
+
+    public func updateMainAnimation(_ offset: CGFloat) {
+        if let viewController = self.mainViewController {
+            (viewController.pax.mainEffect ?? self.defaultEffect)(offset, viewController)
+        }
+    }
+
+    var currentAnimationDuration: TimeInterval {
+        //        velocity = 1
+        //        return TimeInterval(sideAnimationDuration / (max(1, velocity)))
+        return TimeInterval(sideAnimationDuration)
+    }
+
+    @objc func handlePan(_ panGesture: UIPanGestureRecognizer) {
+        let velocity = panGesture.velocity(in: panGesture.view).x
+        let edge = panGesture as? UIScreenEdgePanGestureRecognizer
+        let side: Side = ((panningView != nil && panningView == viewController(at: .left)?.view) ||
+            edge?.edges == UIRectEdge.left) ? .left : .right
+
+        switch panGesture.state {
+        case .began:
+            self.handlePanBegin(for: panGesture, side: side)
+        case .ended:
+            self.handlePanEnd(for: panGesture, side: side, velocity: velocity)
+        case .changed:
+            handlePanChanged(for: panGesture, side: side, velocity: velocity)
+
+        default:
+            self.panningView = nil
+        }
+    }
+}
+
+extension Pax: UIGestureRecognizerDelegate {
+    public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        guard let pan = gestureRecognizer as? UIPanGestureRecognizer else {
+            return true
+        }
+        if pan == self.rightEdgePanGestureRecognizer &&
+            self.viewController(at: .right) == nil &&
+            self.isOpen(at: .left) == false {
+            return false
+        }
+        if pan == self.leftEdgePanGestureRecognizer &&
+            self.viewController(at: .left) == nil &&
+            !self.isOpen(at: .right) == false {
+            return false
+        }
+        let velocity = pan.velocity(in: pan.view)
+        return abs(velocity.y) < abs(velocity.x)
+    }
+}
+
+extension Pax {
+
+    public func setMainViewController(_ mainViewController: UIViewController, animated: Bool = false) {
+        let oldController = (mainViewController != self.mainViewController) ? self.mainViewController : nil
+
+        let animated = oldController != nil ? animated : false
+        self.mainViewController = mainViewController
+
+        self.addChild(mainViewController)
+        self.updateMainAnimation((self.isOpen(at: .left) || self.isOpen(at: .right)) ? 1 : 0)
+        if hidesLeftViewControllerOnMainChange {
+            self.hideViewController(at: .left, animated: animated)
+        } else if hidesRightViewControllerOnMainChange {
+            self.hideViewController(at: .right, animated: animated)
+        }
+        if oldController == nil {
+            self.view.insertSubview(mainViewController.view, at: 0)
+        } else {
+            self.view.insertSubview(mainViewController.view, aboveSubview: oldController!.view)
+        }
+
+        mainViewController.view.pax_centerInSuperview()
+
+        self.setupShadowView()
+
+        let completion = {(finished: Bool) -> Void in
+            oldController?.view.removeFromSuperview()
+            oldController?.removeFromParent()
+        }
+        if animated {
+            //            mainViewController.view.alpha = 0
+            UIView.animate(withDuration: TimeInterval(self.mainAnimationDuration), animations: {
+                mainViewController.view.alpha = 1
+            }, completion: completion)
+        } else {
+            completion(true)
+        }
+        mainViewController.view.addGestureRecognizer(self.leftEdgePanGestureRecognizer)
+        mainViewController.view.addGestureRecognizer(self.rightEdgePanGestureRecognizer)
+        mainViewController.view.layer.masksToBounds = true
+
+    }
+
+    public func isOpen(at side: Side) -> Bool {
+        guard let viewController = self.viewController(at: side) else {
+            return false
+        }
+        switch side {
+        case .left: return abs(viewController.view.frame.origin.x - self.leftClosedPosition) > 1
+        case .right: return abs(viewController.view.frame.origin.x - self.view.bounds.width) > 1
+        }
+    }
+
+    open func setViewController(_ viewController: UIViewController?, at side: Side) {
+        let oldViewController = self.viewController(at: side)
+        oldViewController?.view.removeFromSuperview()
+        oldViewController?.removeFromParent()
+        guard let viewController = viewController else {
+            sideControllers[side] = nil
+            return
+        }
+        sideControllers[side] = viewController
+        _ = viewController.view
+        self.addChild(viewController)
+        self.view.addSubview(viewController.view)
+        viewController.view.isUserInteractionEnabled = true
+        let gesture = UIPanGestureRecognizer(target: self, action: #selector(handlePan(_:)))
+        gesture.cancelsTouchesInView = true
+        viewController.view.addGestureRecognizer(gesture)
+        let menuWidth = viewController.pax.menuWidth
+        switch side {
+        case .left:
+            self.leftOpenPosition = 0
+            self.leftClosedPosition = -menuWidth
+            self.leftConstraint = viewController.view.pax_alignLeft(width: menuWidth)
+            self.leftPanGestureRecognizer = gesture
+            self.leftEdgePanGestureRecognizer.isEnabled = true
+        case .right:
+            self.rightOpenPosition = 0
+            self.rightClosedPosition = -menuWidth
+            self.rightConstraint = viewController.view.pax_alignRight(width: menuWidth)
+            self.rightPanGestureRecognizer = gesture
+            self.rightEdgePanGestureRecognizer.isEnabled = true
+
+        }
+        self.hideViewController(at: side, animated: false)
+    }
+
+    public func showViewController(at side: Side, animated: Bool, completion: @escaping (Bool) -> Void = { _ in }) {
+        guard let viewController = self.viewController(at: side) else { return }
+        let view = viewController.view
+        let shadowView = self.shadowView
+        shadowView?.isHidden = false
+        viewController.view.layer.zPosition = 1
+        let shadowViewAlpha = self.shadowViewAlpha
+
+        switch side {
+        case .left:
+            guard let constraint = leftConstraint else { return }
+            constraint.constant = self.leftOpenPosition
+        case .right:
+            guard let constraint = rightConstraint else { return }
+            constraint.constant = self.rightOpenPosition
+        }
+
+        let animations = {
+            view?.superview?.layoutIfNeeded()
+            shadowView?.alpha = shadowViewAlpha
+            let relative: CGFloat = 1.0
+            self.updateMainAnimation(relative)
+        }
+        if animated {
+            UIView.animate(withDuration: currentAnimationDuration,
+                           delay: 0, options: .curveEaseOut,
+                           animations: animations, completion: completion)
+        } else {
+            animations()
+            completion(true)
+        }
+    }
+    public func hideViewController(at side: Side, animated: Bool, completion: @escaping (Bool) -> Void = { _ in }) {
+        guard let viewController = self.viewController(at: side) else { return }
+        leftEdgePanGestureRecognizer.isEnabled = false
+        rightEdgePanGestureRecognizer.isEnabled = false
+        rightPanGestureRecognizer?.isEnabled = false
+        leftPanGestureRecognizer?.isEnabled = false
+        switch side {
+        case .left: self.leftConstraint?.constant = self.leftClosedPosition
+        case .right: self.rightConstraint?.constant = self.rightClosedPosition
+        }
+        let animations = { [weak self] in
+            viewController.view?.superview?.layoutIfNeeded()
+            self?.shadowView?.alpha = 0
+            self?.updateMainAnimation(0)
+        }
+        let ending = { [weak self] (finished: Bool) -> Void in
+            self?.leftEdgePanGestureRecognizer.isEnabled = true
+            self?.rightPanGestureRecognizer?.isEnabled = true
+            self?.leftPanGestureRecognizer?.isEnabled = true
+            self?.rightEdgePanGestureRecognizer.isEnabled = true
+            viewController.view?.setNeedsUpdateConstraints()
+            viewController.view?.updateConstraintsIfNeeded()
+            self?.panningView = nil
+            if finished {
+                self?.shadowView?.isHidden = true
+            }
+            completion(finished)
+        }
+
+        if animated {
+            UIView.animate(withDuration: currentAnimationDuration,
+                           delay: 0,
+                           options: .curveEaseOut,
+                           animations: animations,
+                           completion: ending)
+        } else {
+            animations()
+            ending(true)
+        }
+    }
+}
+
+fileprivate extension Pax {
     func setupShadowView() {
-        if (self.isViewLoaded == false) {
+        if self.isViewLoaded == false {
             return
         }
         let prevAlpha = self.shadowView?.alpha ?? 0.0
@@ -293,7 +454,7 @@ open class Pax: UIViewController, UIGestureRecognizerDelegate {
         shadowView.addGestureRecognizer(tap)
         self.shadowView = shadowView
 
-        if (self.mainViewController != nil) {
+        if self.mainViewController != nil {
 
             let gesture = UIPanGestureRecognizer(target: self, action: #selector(handlePan(_:)))
             gesture.delegate = self
@@ -305,324 +466,75 @@ open class Pax: UIViewController, UIGestureRecognizerDelegate {
         }
 
     }
-
-    public func setMainViewController(_ mainViewController: UIViewController, animated: Bool = false) {
-        let oldController = (mainViewController != self.mainViewController) ? self.mainViewController : nil
-
-        let animated = oldController != nil ? animated : false
-        self.mainViewController = mainViewController
-
-        self.addChild(mainViewController)
-        self.updateMainAnimation((self.isLeftOpen || self.isRightOpen) ? 1 : 0)
-        if (self.shouldHideLeftViewControllerOnMainChange) {
-            self.hideLeftViewController(animated: animated)
-        }
-        else if (self.shouldHideRightViewControllerOnMainChange) {
-            self.hideRightViewController(animated: animated)
-        }
-        if (oldController == nil) {
-            self.view.insertSubview(mainViewController.view, at: 0)
+}
+fileprivate extension Pax {
+     func handlePanBegin(for panGesture: UIPanGestureRecognizer, side: Side) {
+        self.velocity = 0
+        if isOpen(at: .left) == false && isOpen(at: .right) == false {
+            panningView = self.viewController(at: side)?.view
+            self.shadowView?.isHidden = false
+            self.shadowView?.alpha = 0
         } else {
-            self.view.insertSubview(mainViewController.view, aboveSubview: oldController!.view)
+            panningView = (isOpen(at: .left) ?
+                viewController(at: .left) :
+                viewController(at: .right))?.view
         }
-        if let left = leftViewController?.view {
-            mainViewController.view.pax_centerInSuperview()
+        panningPadding = self.panningView?.frame.minX ?? 0.0
+    }
+    func handlePanEnd(for panGesture: UIPanGestureRecognizer, side: Side, velocity: CGFloat) {
+        guard self.panningView != nil else {
+            return
+        }
+
+        if velocity > view.frame.size.width / 4.0 && side == .left && isOpen(at: .right) == false {
+            showViewController(at: .left, animated: true)
+
+        } else if velocity < view.frame.size.width / 4.0 && isOpen(at: .left) == false && side == .right {
+
+            showViewController(at: .right, animated: true)
+
         } else {
-            mainViewController.view.pax_centerInSuperview()
-        }
-        self.setupShadowView()
+            guard let viewController = self.viewController(at: side) else { return }
+            var hide: Bool = false
+            let minX = viewController.view.frame.minX
+            switch side {
+            case .left:
 
-        let completion = { [weak self]
-            (finished: Bool) -> Void in
-            oldController?.view.removeFromSuperview()
-            oldController?.removeFromParent()
+                let position = (minX - self.leftOpenPosition)/(viewController.pax.menuWidth - self.leftOpenPosition)
+                hide = abs(position * min(1, velocity)) > 0.5
+            case .right:
+                let position: CGFloat = (minX - rightOpenPosition)/(rightClosedPosition - rightOpenPosition)
+                hide = abs(position) > 0.5
+            }
+            hide ?
+                self.hideViewController(at: side, animated: true) :
+                self.showViewController(at: side, animated: true)
 
         }
-        if animated {
-//            mainViewController.view.alpha = 0
-            UIView.animate(withDuration: TimeInterval(self.mainAnimationDuration), animations: {
-                mainViewController.view.alpha = 1
-            }, completion: completion)
-        } else {
-            completion(true)
-        }
-        mainViewController.view.addGestureRecognizer(self.leftEdgePanGestureRecognizer)
-        mainViewController.view.addGestureRecognizer(self.rightEdgePanGestureRecognizer)
-        mainViewController.view.layer.masksToBounds = true
-        
     }
 
-    @objc func hideSideControllers() {
-
-        if (self.isLeftOpen) {
-            self.hideLeftViewController(animated: true)
-        }
-        if (self.isRightOpen) {
-            self.hideRightViewController(animated: true)
-        }
-    }
-    
-    public func updateMainAnimation(_ offset: CGFloat) {
-        if let viewController = self.mainViewController {
-            (viewController.pax.mainEffect ?? self.defaultEffect)(offset, viewController)
-        }
-    }
-    
-    public func showLeftViewController(animated: Bool) {
-        guard let leftViewController = self.leftViewController else {
+    func handlePanChanged(for panGesture: UIPanGestureRecognizer, side: Side, velocity: CGFloat) {
+        guard self.panningView != nil else {
             return
         }
+        var origin = panGesture.translation(in: self.view).x
+        self.velocity = velocity
 
-        let view = leftViewController.view
-        guard let left = self.leftConstraint else {
-            return
+        var alpha: CGFloat = 0.0
+        switch side {
+        case .left:
+            origin = max(self.leftClosedPosition, min(origin + self.panningPadding, self.leftOpenPosition))
+            alpha = shadowViewAlpha * (leftClosedPosition - origin) / (leftClosedPosition - leftOpenPosition)
+            self.leftConstraint?.constant = origin
+        case .right:
+            let delta = view.bounds.width - (viewController(at: .right)?.paxWidth ?? 0)
+            origin = max(rightClosedPosition, (min(-(origin + self.panningPadding - delta), rightOpenPosition)))
+            alpha = shadowViewAlpha * (rightClosedPosition - origin) / (rightClosedPosition - rightOpenPosition)
+            self.rightConstraint?.constant = origin
         }
+        self.shadowView?.alpha = alpha
 
-        let shadowView = self.shadowView
-        shadowView?.isHidden = false
-        leftViewController.view.layer.zPosition = 1
-        left.constant = self.leftOpenPosition
-        let shadowViewAlpha = self.shadowViewAlpha
-
-        let animations = {
-            view?.superview?.layoutIfNeeded()
-            shadowView?.alpha = shadowViewAlpha
-            let relative: CGFloat = 1.0
-            self.updateMainAnimation(relative)
-        }
-        let completion = { (finished: Bool) -> Void in
-            return
-        }
-
-        if (animated) {
-            UIView.animate(withDuration: currentAnimationDuration,
-                           delay: 0, options: .curveEaseOut,
-                           animations: animations, completion: completion)
-        } else {
-            animations()
-            completion(true)
-        }
-
-    }
-    public func hideLeftViewController(animated: Bool, completion: @escaping (Bool)->Void = { _ in }) {
-        guard self.leftViewController != nil else {
-            completion(false)
-            return
-        }
-        leftEdgePanGestureRecognizer.isEnabled = false
-        rightEdgePanGestureRecognizer.isEnabled = false
-        rightPanGestureRecognizer?.isEnabled = false
-        leftPanGestureRecognizer?.isEnabled = false
-
-        self.leftConstraint?.constant = self.leftClosedPosition
-
-        let animations = { [weak self] in
-            self?.leftViewController?.view?.superview?.layoutIfNeeded()
-            self?.shadowView?.alpha = 0
-            self?.updateMainAnimation(0)
-        }
-        let ending = { [weak self] (finished: Bool) -> Void in
-            self?.leftEdgePanGestureRecognizer.isEnabled = true
-            self?.rightPanGestureRecognizer?.isEnabled = true
-            self?.leftPanGestureRecognizer?.isEnabled = true
-            self?.rightEdgePanGestureRecognizer.isEnabled = true
-            self?.leftViewController?.view?.setNeedsUpdateConstraints()
-            self?.leftViewController?.view?.updateConstraintsIfNeeded()
-            self?.panningView = nil
-            if (finished == true) {
-                self?.shadowView?.isHidden = true
-            }
-            completion(finished)
-        }
-
-        if (animated) {
-            UIView.animate(withDuration: currentAnimationDuration,
-                           delay: 0, options: .curveEaseOut,
-                           animations: animations, completion: ending)
-        } else {
-            animations()
-            ending(true)
-        }
-    }
-    var currentAnimationDuration: TimeInterval {
-        velocity = 1
-        return TimeInterval(sideAnimationDuration / (max(1, velocity)))
-    }
-    public func showRightViewController(animated: Bool) {
-        guard let leftViewController = self.rightViewController else {
-            return
-        }
-
-        let view = leftViewController.view
-        guard let left = self.rightConstraint else {
-            return
-        }
-
-        let shadowView = self.shadowView
-        shadowView?.isHidden = false
-        leftViewController.view.layer.zPosition = 1
-        left.constant = self.rightOpenPosition
-        let shadowViewAlpha = self.shadowViewAlpha
-
-        let animations = {
-            view?.superview?.layoutIfNeeded()
-            shadowView?.alpha = shadowViewAlpha
-            let relative: CGFloat = 1.0
-            self.updateMainAnimation(relative)
-        }
-        let completion = { (finished: Bool) -> Void in
-            return
-        }
-
-        if (animated) {
-            UIView.animate(withDuration: currentAnimationDuration,
-                           delay: 0, options: .curveEaseOut,
-                           animations: animations, completion: completion)
-        } else {
-            animations()
-            completion(true)
-        }
-
-    }
-    public func hideRightViewController(animated: Bool, completion: @escaping (Bool)->Void = { _ in }) {
-        guard self.rightViewController != nil else {
-            completion(false)
-            return
-        }
-        leftEdgePanGestureRecognizer.isEnabled = false
-        rightEdgePanGestureRecognizer.isEnabled = false
-        rightPanGestureRecognizer?.isEnabled = false
-        leftPanGestureRecognizer?.isEnabled = false
-
-        self.rightConstraint?.constant = self.rightClosedPosition
-
-        let animations = { [weak self] in
-            self?.rightViewController?.view?.superview?.layoutIfNeeded()
-            self?.shadowView?.alpha = 0
-            self?.updateMainAnimation(0)
-        }
-        let ending = { [weak self] (finished: Bool) -> Void in
-            self?.leftEdgePanGestureRecognizer.isEnabled = true
-            self?.rightPanGestureRecognizer?.isEnabled = true
-            self?.leftPanGestureRecognizer?.isEnabled = true
-            self?.rightEdgePanGestureRecognizer.isEnabled = true
-            self?.rightViewController?.view?.setNeedsUpdateConstraints()
-            self?.rightViewController?.view?.updateConstraintsIfNeeded()
-            self?.panningView = nil
-            if (finished == true) {
-                self?.shadowView?.isHidden = true
-            }
-            completion(finished)
-        }
-
-        if (animated) {
-            UIView.animate(withDuration: currentAnimationDuration,
-                           delay: 0, options: .curveEaseOut,
-                           animations: animations, completion: ending)
-        } else {
-            animations()
-            ending(true)
-        }
-    }
-
-    fileprivate var panningPadding: CGFloat = 0.0
-
-    @objc func handlePan(_ panGesture: UIPanGestureRecognizer) {
-        let velocity = panGesture.velocity(in: panGesture.view).x
-
-        let edge = panGesture as? UIScreenEdgePanGestureRecognizer
-        let isLeft = (panningView != nil && panningView == self.leftViewController?.view) || edge?.edges == UIRectEdge.left
-        switch panGesture.state {
-        case .began:
-            self.velocity = 0
-            if (self.isLeftOpen == false && self.isRightOpen == false) {
-                panningView = isLeft ? self.leftViewController?.view : self.rightViewController?.view
-                self.shadowView?.isHidden = false
-                self.shadowView?.alpha = 0
-            } else {
-                panningView = isLeftOpen ? self.leftViewController?.view : self.rightViewController?.view
-            }
-            if !isLeft {
-                panningPadding = self.panningView?.frame.minX ?? 0.0
-            } else {
-                panningPadding = self.panningView?.frame.origin.x ?? 0.0
-            }
-        case .ended:
-            guard self.panningView != nil else {
-                return
-            }
-
-            if (velocity > self.view.frame.size.width / 4.0 && isLeft == true && self.isRightOpen == false) {
-
-                self.showLeftViewController(animated: true)
-
-            } else if (velocity < self.view.frame.size.width / 4.0 && self.isLeftOpen == false && isLeft == false) {
-
-                self.showRightViewController(animated: true)
-
-            } else {
-                if (isLeft == true) {
-
-                    let w = self.leftViewController?.pax_width ??  0.0
-                    var hide: Bool = false
-
-                    let x = self.leftViewController?.view.frame.origin.x ?? 0.0
-                    let pos: CGFloat = (x - self.leftOpenPosition)/(w - self.leftOpenPosition)
-                    hide = abs(pos * min(1, velocity)) > 0.5
-
-
-                    hide ? self.hideLeftViewController(animated: true) : self.showLeftViewController(animated: true)
-
-                } else {
-                    let x = self.rightViewController?.view.frame.origin.x ?? 0.0
-                    //                    let w = self.rightViewController?.pax_width ??  0.0
-                    let pos: CGFloat = (x - self.rightOpenPosition)/(self.rightClosedPosition - self.rightOpenPosition)
-                    abs(pos) > 0.5 ? self.hideRightViewController(animated: true) : self.showRightViewController(animated: true)
-                }
-            }
-        case .changed:
-            guard self.panningView != nil else {
-                return
-            }
-            var x = panGesture.translation(in: self.view).x
-            self.velocity = velocity
-
-            var alpha: CGFloat = 0.0
-            if (isLeft) {
-                x = max(self.leftClosedPosition, min(x + self.panningPadding, self.leftOpenPosition))
-                alpha = shadowViewAlpha * (self.leftClosedPosition - x) / (self.leftClosedPosition - self.leftOpenPosition)
-
-                self.leftConstraint?.constant = x
-            } else {
-                let delta = view.bounds.width - (rightViewController?.pax_width ?? 0)
-                x = max(self.rightClosedPosition, (min(-(x + self.panningPadding - delta), self.rightOpenPosition)))
-                alpha = shadowViewAlpha * (self.rightClosedPosition - x) / (self.rightClosedPosition - self.rightOpenPosition)
-                self.rightConstraint?.constant = x
-            }
-            self.shadowView?.alpha = alpha
-
-            let relative = (alpha / shadowViewAlpha)
-            self.updateMainAnimation(relative)
-
-        default:
-            self.panningView = nil
-        }
-    }
-
-
-
-    public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-        guard let pan = gestureRecognizer as? UIPanGestureRecognizer else {
-            return true
-        }
-        if (pan == self.rightEdgePanGestureRecognizer && self.rightViewController == nil && self.isLeftOpen == false) {
-            return false
-        }
-        if (pan == self.leftEdgePanGestureRecognizer && self.leftViewController == nil && !self.isRightOpen == false) {
-            return false
-        }
-        let velocity = pan.velocity(in: pan.view)
-        return abs(velocity.y) < abs(velocity.x)
+        let relative = (alpha / shadowViewAlpha)
+        self.updateMainAnimation(relative)
     }
 }
-
